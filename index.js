@@ -14,7 +14,24 @@ app.get('/', (req, res) => {
       res.send('Hello World!')
 })
 app.get('/home', (req, res) => {
-  res.send('Hello Suman!')
+  const list = [
+    {
+      id:1,
+      name:'suman',
+      email:'suman@gmail.com'
+    },
+    {
+      id:1,
+      name:'manju',
+      email:'manju@gmail.com'
+    },
+    {
+      id:3,
+      name:'Dheeraj',
+      email:'dheeraj@gmail.com'
+    }
+  ]
+  res.send(list)
 })
 
 
