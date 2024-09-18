@@ -29,6 +29,11 @@ app.get('/home', (req, res) => {
       id:3,
       name:'Dheeraj',
       email:'dheeraj@gmail.com'
+    },
+    {
+      id:4,
+      name:'Hema',
+      email:'hema@gmail.com'
     }
   ]
   res.send(list)
