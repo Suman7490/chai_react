@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express')
 const cors = require('cors')
 const mysql = require('mysql')
+const { check, validationResult } = require('express-validator');
 
 const app = express();
 app.use(cors());
