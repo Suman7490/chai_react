@@ -21,36 +21,53 @@ db.connect((err) => {
     console.log('Connected to the MySQL database');
   }
 });
+
+
 app.get('/', (req, res) => {
-      res.send('Hello World!')
+  res.send('Hello World!')
 })
+
 app.get('/home', (req, res) => {
   const list = [
     {
-      id:1,
-      name:'suman',
-      email:'suman@gmail.com'
+      id: 1,
+      name: 'suman',
+      email: 'suman@gmail.com'
     },
     {
-      id:1,
-      name:'manju',
-      email:'manju@gmail.com'
+      id: 1,
+      name: 'manju',
+      email: 'manju@gmail.com'
     },
     {
-      id:3,
-      name:'Dheeraj',
-      email:'dheeraj@gmail.com'
+      id: 3,
+      name: 'Dheeraj',
+      email: 'dheeraj@gmail.com'
     },
     {
-      id:4,
-      name:'Hema',
-      email:'hema@gmail.com'
+      id: 4,
+      name: 'Hema',
+      email: 'hema@gmail.com'
     }
   ]
   res.send(list)
 })
 
+app.get('/register', (req, res) => {
+  const sql = 'SELECT * FROM register';
 
+  // Execute the query
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error('Error executing query: ' + err.stack);
+      res.status(500).send('Server error');
+      return;
+    }
+
+    // Send the result as a JSON response
+    res.json(result);
+  });
+});
 
 
 app.listen(process.env.PORT || 4000, () => {
