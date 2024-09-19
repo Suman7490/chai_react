@@ -9,13 +9,18 @@ app.use(express.json());
 
 
 const db = mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  ssl: { rejectUnauthorized: true } // Ensure SSL is set if required
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER, // or the username you created
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB
 });
-
+db.connect((err) => {
+  if (err) {
+    console.log('Error connecting to the database:', err);
+  } else {
+    console.log('Connected to the MySQL database');
+  }
+});
 app.get('/', (req, res) => {
       res.send('Hello World!')
 })
