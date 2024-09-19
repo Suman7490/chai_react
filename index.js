@@ -189,58 +189,58 @@ app.put('/edit/:id', (req, res) => {
 
 
 
-app.get('/pdf/:id', (req, res) => {
-  const quotationId = req.params.id;
-  const sql = `
-      SELECT q.quotation_id, q.name, q.email, q.gender, q.designation, q.domain, q.description, 
-             q.price, q.quantity, q.date, q.entitle, q.total, q.discount, q.grandTotal, q.inputCount,
-             p.label, p.dueWhen, p.installmentAmount
-      FROM quotation q
-      LEFT JOIN payments p ON q.quotation_id = p.quotation_id
-      WHERE q.quotation_id = ?
-  `;
+// app.get('/pdf/:id', (req, res) => {
+//   const quotationId = req.params.id;
+//   const sql = `
+//       SELECT q.quotation_id, q.name, q.email, q.gender, q.designation, q.domain, q.description, 
+//              q.price, q.quantity, q.date, q.entitle, q.total, q.discount, q.grandTotal, q.inputCount,
+//              p.label, p.dueWhen, p.installmentAmount
+//       FROM quotation q
+//       LEFT JOIN payments p ON q.quotation_id = p.quotation_id
+//       WHERE q.quotation_id = ?
+//   `;
 
-  db.query(sql, [quotationId], (err, result) => {
-      if (err) return res.json({ Message: "Error retrieving data" });
+//   db.query(sql, [quotationId], (err, result) => {
+//       if (err) return res.json({ Message: "Error retrieving data" });
 
-      if (result.length === 0) {
-          return res.json({ Message: "Quotation not found" });
-      }
+//       if (result.length === 0) {
+//           return res.json({ Message: "Quotation not found" });
+//       }
 
-      const data = {
-          id: result[0].quotation_id,
-          name: result[0].name,
-          email: result[0].email,
-          gender: result[0].gender,
-          date: result[0].date,
-          designation: result[0].designation,
-          domain: result[0].domain,
-          entitle: result[0].entitle,
-          description: result[0].description,
-          totalInstallment: 0,
-          price: result[0].price,
-          quantity: result[0].quantity,
-          total: result[0].total,
-          discount: result[0].discount,
-          grandTotal: result[0].grandTotal,
-          inputCount: result[0].inputCount,
-          installments: []
-      };
+//       const data = {
+//           id: result[0].quotation_id,
+//           name: result[0].name,
+//           email: result[0].email,
+//           gender: result[0].gender,
+//           date: result[0].date,
+//           designation: result[0].designation,
+//           domain: result[0].domain,
+//           entitle: result[0].entitle,
+//           description: result[0].description,
+//           totalInstallment: 0,
+//           price: result[0].price,
+//           quantity: result[0].quantity,
+//           total: result[0].total,
+//           discount: result[0].discount,
+//           grandTotal: result[0].grandTotal,
+//           inputCount: result[0].inputCount,
+//           installments: []
+//       };
 
-      result.forEach(row => {
-          if (row.label) {
-              data.installments.push({
-                  label: row.label,
-                  dueWhen: row.dueWhen,
-                  installmentAmount: row.installmentAmount
-              });
-              data.totalInstallment++;
-          }
-      });
+//       result.forEach(row => {
+//           if (row.label) {
+//               data.installments.push({
+//                   label: row.label,
+//                   dueWhen: row.dueWhen,
+//                   installmentAmount: row.installmentAmount
+//               });
+//               data.totalInstallment++;
+//           }
+//       });
 
-      return res.json(data);
-  });
-});
+//       return res.json(data);
+//   });
+// });
 
 app.listen(process.env.PORT || 4000, () => {
   console.log(`app is listening`)
