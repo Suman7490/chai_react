@@ -79,7 +79,7 @@ app.get('/', (req, res) => {
 });
 
 
-// ************ Create Invoice ***************
+// ************* Post Data ************
 app.post('/create', (req, res) => {
   const quotation_sql = "INSERT INTO quotation (`name`, `email`, `gender`, `date`, `designation`, `domain`, `entitle`, `description`, `price`, `quantity`, `total`, `discount`, `grandTotal`, `inputCount`) VALUES (?)";
   const quotation_values = [
@@ -189,58 +189,192 @@ app.put('/edit/:id', (req, res) => {
 
 
 
-// app.get('/pdf/:id', (req, res) => {
-//   const quotationId = req.params.id;
-//   const sql = `
-//       SELECT q.quotation_id, q.name, q.email, q.gender, q.designation, q.domain, q.description, 
-//              q.price, q.quantity, q.date, q.entitle, q.total, q.discount, q.grandTotal, q.inputCount,
-//              p.label, p.dueWhen, p.installmentAmount
-//       FROM quotation q
-//       LEFT JOIN payments p ON q.quotation_id = p.quotation_id
-//       WHERE q.quotation_id = ?
-//   `;
 
-//   db.query(sql, [quotationId], (err, result) => {
-//       if (err) return res.json({ Message: "Error retrieving data" });
+// ************** Delete data ***************
+app.delete('/delete/:id', (req, res) => {
+  const quotationId = req.params.id;
 
-//       if (result.length === 0) {
-//           return res.json({ Message: "Quotation not found" });
-//       }
+  // SQL query to delete the quotation
+  const deleteQuotationSql = `DELETE FROM quotation WHERE quotation_id = ?`;
 
-//       const data = {
-//           id: result[0].quotation_id,
-//           name: result[0].name,
-//           email: result[0].email,
-//           gender: result[0].gender,
-//           date: result[0].date,
-//           designation: result[0].designation,
-//           domain: result[0].domain,
-//           entitle: result[0].entitle,
-//           description: result[0].description,
-//           totalInstallment: 0,
-//           price: result[0].price,
-//           quantity: result[0].quantity,
-//           total: result[0].total,
-//           discount: result[0].discount,
-//           grandTotal: result[0].grandTotal,
-//           inputCount: result[0].inputCount,
-//           installments: []
-//       };
+  db.query(deleteQuotationSql, [quotationId], (err, result) => {
+      if (err) {
+          console.error('Error deleting quotation:', err);
+          return res.status(500).json({ message: 'Error deleting quotation', error: err });
+      }
 
-//       result.forEach(row => {
-//           if (row.label) {
-//               data.installments.push({
-//                   label: row.label,
-//                   dueWhen: row.dueWhen,
-//                   installmentAmount: row.installmentAmount
-//               });
-//               data.totalInstallment++;
-//           }
-//       });
+      // Check if any rows were affected (i.e., if the delete was successful)
+      if (result.affectedRows === 0) {
+          return res.status(404).json({ message: 'Quotation not found' });
+      }
 
-//       return res.json(data);
-//   });
-// });
+      // Delete associated installments
+      const deleteInstallmentsSql = `DELETE FROM payments WHERE quotation_id = ?`;
+      db.query(deleteInstallmentsSql, [quotationId], (err, result) => {
+          if (err) {
+              console.error('Error deleting installments:', err);
+              return res.status(500).json({ message: 'Error deleting installments', error: err });
+          }
+
+          return res.json({ message: "Quotation and installments deleted successfully" });
+      });
+  });
+});
+
+
+// ************* Get Data by Quotation ID *************
+app.get('/pdf/:id', (req, res) => {
+  const quotationId = req.params.id;
+  const sql = `
+      SELECT q.quotation_id, q.name, q.email, q.gender, q.designation, q.domain, q.description, 
+             q.price, q.quantity, q.date, q.entitle, q.total, q.discount, q.grandTotal, q.inputCount,
+             p.label, p.dueWhen, p.installmentAmount
+      FROM quotation q
+      LEFT JOIN payments p ON q.quotation_id = p.quotation_id
+      WHERE q.quotation_id = ?
+  `;
+
+  db.query(sql, [quotationId], (err, result) => {
+      if (err) return res.json({ Message: "Error retrieving data" });
+
+      if (result.length === 0) {
+          return res.json({ Message: "Quotation not found" });
+      }
+
+      const data = {
+          id: result[0].quotation_id,
+          name: result[0].name,
+          email: result[0].email,
+          gender: result[0].gender,
+          date: result[0].date,
+          designation: result[0].designation,
+          domain: result[0].domain,
+          entitle: result[0].entitle,
+          description: result[0].description,
+          totalInstallment: 0,
+          price: result[0].price,
+          quantity: result[0].quantity,
+          total: result[0].total,
+          discount: result[0].discount,
+          grandTotal: result[0].grandTotal,
+          inputCount: result[0].inputCount,
+          installments: []
+      };
+
+      result.forEach(row => {
+          if (row.label) {
+              data.installments.push({
+                  label: row.label,
+                  dueWhen: row.dueWhen,
+                  installmentAmount: row.installmentAmount
+              });
+              data.totalInstallment++;
+          }
+      });
+
+      return res.json(data);
+  });
+});
+
+
+// ************************ Register form ************************
+app.post('/register', [
+  check('email').isEmail().withMessage('Invalid email format'),
+], (req, res) => {
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { name, email, password, gender, role } = req.body;
+  const checkEmailQuery = 'SELECT * FROM employees WHERE email = ?';
+
+  // Hash the password
+  db.query(checkEmailQuery, [email], (err, result) => {
+      if (err) {
+          console.error('Error checking email:', err);
+          return res.status(500).json({ message: 'Error checking email', error: err });
+      }
+
+      if (result.length > 0) {
+          // Email already exists
+          return res.status(409).json({ message: 'Email already in use' });
+      }
+
+      bcrypt.hash(password, saltRounds, (err, hash) => {
+          if (err) {
+              return res.status(500).json({ message: 'Error hashing password', error: err });
+          }
+
+          const query = 'INSERT INTO employees (name, email, password, gender, role) VALUES (?, ?, ?, ?, ?)';
+          db.query(query, [name, email, hash, gender, role], (err, result) => {
+              if (err) {
+                  console.error('Error registering user:', err);
+                  return res.status(500).json({ message: 'Error registering user', error: err });
+              }
+              res.status(201).json({ message: 'User registered successfully' });
+          });
+      });
+
+
+
+  })
+
+});
+
+
+
+// ************* Check email exists or not ******************
+app.post('/check-email', (req, res) => {
+  const { email } = req.body;
+
+  const checkEmailQuery = 'SELECT COUNT(*) as count FROM employees WHERE email = ?';
+  db.query(checkEmailQuery, [email], (err, results) => {
+      if (err) {
+          console.error('Error checking email:', err);
+          return res.status(500).json({ error: 'Internal server error' });
+      }
+      
+      const emailExists = results[0].count > 0;
+      res.json({ exists: emailExists });
+  });
+});
+  // ****************** Login Form **************
+  app.post('/login', (req, res) => {
+      const { email, password } = req.body;
+    
+      const query = 'SELECT * FROM employees WHERE email = ?';
+      db.query(query, [email], (err, results) => {
+        if (err) {
+          console.error('Error finding user:', err);
+          return res.status(500).json({ message: 'Error finding user', error: err });
+        }
+    
+        if (results.length === 0) {
+          return res.status(401).json({ message: 'Invalid email or password' });
+        }
+    
+        const user = results[0];
+        bcrypt.compare(password, user.password, (err, isMatch) => {
+          if (err) {
+            console.error('Error comparing passwords:', err);
+            return res.status(500).json({ message: 'Error comparing passwords', error: err });
+          }
+    
+          if (!isMatch) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+          }
+    
+          // Generate JWT
+          const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, secretKey, { expiresIn: '1h' });
+          res.json({ message: 'Login successful', token });
+        });
+      });
+    });
+
+
+
 
 app.listen(process.env.PORT || 4000, () => {
   console.log(`app is listening`)
