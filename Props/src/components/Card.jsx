@@ -5,7 +5,7 @@ const Card = (props) => {
     return (
         <>
             <figure className="md:flex bg-slate-100 rounded-xl p-8 md:p-0 dark:bg-slate-800 border mb-2">
-                <img className="w-24 h-24 md:w-48 md:h-auto  rounded-xl mx-auto" src="https://buffer.com/library/content/images/size/w1200/2023/10/free-images.jpg" alt="" width="384" height="512" />
+                <img className="w-4 h-4 md:w-20 md:h-auto rounded-xl" src="https://buffer.com/library/content/images/size/w1200/2023/10/free-images.jpg" alt="" width="150" height="150" />
                 <div className="pt-6 md:p-4 text-center md:text-left space-y-2">
                     <blockquote>
                         <p className="text-sm">
