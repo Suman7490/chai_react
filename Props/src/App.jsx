@@ -5,6 +5,7 @@ import Practice from './components/Practics'
 import PasswordGenerator from './components/PasswordGenerator'
 import CurrrencyConvertor from './components/CurrrencyConvertor'
 import InputBox from './components/InputBox'
+import HigherOrderCmp from './components/HigherOrderCmp'
 
 function App() {
   const [bg, setBg] = useState('black')
@@ -19,13 +20,13 @@ function App() {
               <button className='outline-none px-4 py-1 rounded-full text-white shadow-lg' style={{ backgroundColor: "red" }} onClick={() => setBg("red")}>Red</button>
             </div>
             <div className='flex flex-wrap justify-center gap-3 shadow-lg bg-white px-3 py-2 rounded-3xl'>
-              <button className='outline-none px-4 py-1 rounded-full text-white shadow-lg' style={{ backgroundColor: "green" }} onClick={() => setBg("green")}>Red</button>
+              <button className='outline-none px-4 py-1 rounded-full text-white shadow-lg' style={{ backgroundColor: "green" }} onClick={() => setBg("green")}>Green</button>
             </div>
             <div className='flex flex-wrap justify-center gap-3 shadow-lg bg-white px-3 py-2 rounded-3xl'>
-              <button className='outline-none px-4 py-1 rounded-full text-white shadow-lg' style={{ backgroundColor: "blue" }} onClick={() => setBg("blue")}>Red</button>
+              <button className='outline-none px-4 py-1 rounded-full text-white shadow-lg' style={{ backgroundColor: "blue" }} onClick={() => setBg("blue")}>Blue</button>
             </div>
             <div className='flex flex-wrap justify-center gap-3 shadow-lg bg-white px-3 py-2 rounded-3xl'>
-              <button className='outline-none px-4 py-1 rounded-full text-white shadow-lg' style={{ backgroundColor: "black" }} onClick={() => setBg("black")}>Red</button>
+              <button className='outline-none px-4 py-1 rounded-full text-white shadow-lg' style={{ backgroundColor: "black" }} onClick={() => setBg("black")}>Black</button>
             </div>
           </div>
         </div>
@@ -36,7 +37,8 @@ function App() {
               <PasswordGenerator />
             </div>
             <div className='border'>
-              <InputBox />
+              {/* <InputBox /> */}
+              <Practice />
             </div>
           </div>
 
@@ -51,15 +53,13 @@ function App() {
 
 
             <div className='border px-1 py-1'>
-                <Practice />
+            <HigherOrderCmp bgColor="blue" cmp={<Card/>}/>
             </div>
           </div>
 
 
         </div>
       </div>
-
-      {/* <Practice/> */}
 
     </>
 
