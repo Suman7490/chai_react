@@ -14,8 +14,8 @@ const Practics = () => {
 
 
         <div className='text-center my-auto'>
-            <p className='text-white font-medium text-xl'>Initial Value: {add}</p>
-            <p className='text-white'>Multiplied Value: {myltuplyResult}</p>
+            <p className='font-medium text-xl'>Initial Value: {add}</p>
+            <p>Multiplied Value: {myltuplyResult}</p>
             <button className='bg-orange-600 px-2 rounded py-2 mr-3' onClick={removebutton}>Remove 1</button>
             <button onClick={addButton} className='bg-orange-600 px-2 rounded py-2'>Click to multiple by 5</button>
         </div>
